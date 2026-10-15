@@ -98,13 +98,16 @@
   .chart { width: 38vw; height: 46vh; }
   .nw { white-space: nowrap; }
   .small-facts li { font-size: clamp(17px, 2vw, 28px); }
+  table.mini.cmp { font-size: clamp(14px, 1.6vw, 23px); width: 100%; }
+  table.mini.cmp th, table.mini.cmp td { padding: 1.2vh .9vw; }
+  table.mini.cmp td { white-space: nowrap; }
 </style>
 </head>
 <body>
 
 <!-- 1 제목 -->
 <section class="slide chapter">
-  <div class="kicker">1 / 12 · 제목</div>
+  <div class="kicker">1 / 16 · 제목</div>
   <h1>능력치 여섯 개만 보고<br>선수의 포지션을 맞힐 수 있는가</h1>
   <p class="sub">팀 FC25 · 10101 홍길동 · 10102 김영희 · 10103 이철수</p>
   <p class="small">선생님이 만든 가상 팀의 샘플 · 데이터와 수치는 실제 계산값</p>
@@ -112,7 +115,7 @@
 
 <!-- 2 데이터셋 -->
 <section class="slide">
-  <div class="kicker">2 / 12 · 우리 팀의 데이터셋</div>
+  <div class="kicker">2 / 16 · 우리 팀의 데이터셋</div>
   <h2>우리 팀의 데이터셋</h2>
   <div class="withimg">
     <ul class="facts txt">
@@ -127,7 +130,7 @@
 
 <!-- 3 선택 이유 -->
 <section class="slide">
-  <div class="kicker">3 / 12 · 이 문제를 선택한 이유</div>
+  <div class="kicker">3 / 16 · 이 문제를 선택한 이유</div>
   <h2>이 문제를 선택한 이유</h2>
   <ul class="facts">
     <li>셋 다 축구 게임으로 선수단을 짜 본 경험</li>
@@ -139,7 +142,7 @@
 
 <!-- 4 과정 -->
 <section class="slide">
-  <div class="kicker">4 / 12 · 어떤 과정으로 분석했는지</div>
+  <div class="kicker">4 / 16 · 어떤 과정으로 분석했는지</div>
   <h2>어떤 과정으로 분석했는지</h2>
   <ul class="facts">
     <li>데이터 판정, 선생님 승인 (3차시)</li>
@@ -152,7 +155,7 @@
 
 <!-- 5 고려한 모델 -->
 <section class="slide">
-  <div class="kicker">5 / 12 · 어떤 모델을 고려했는지</div>
+  <div class="kicker">5 / 16 · 어떤 모델을 고려했는지</div>
   <h2>어떤 모델을 고려했는지</h2>
   <table class="mini">
     <tr><th>모델</th><th>정확도</th><th>macro F1</th><th>FW 재현율</th></tr>
@@ -168,7 +171,7 @@
 
 <!-- 6 선택 이유 -->
 <section class="slide">
-  <div class="kicker">6 / 12 · 왜 이 모델을 선택했는지</div>
+  <div class="kicker">6 / 16 · 왜 이 모델을 선택했는지</div>
   <h2>왜 이 모델을 선택했는지</h2>
   <ul class="facts">
     <li>최종: 로지스틱 회귀, 수업 11차시에서 배운 모델</li>
@@ -181,7 +184,7 @@
 
 <!-- 7 평가지표 -->
 <section class="slide">
-  <div class="kicker">7 / 12 · 우리가 사용한 평가지표</div>
+  <div class="kicker">7 / 16 · 우리가 사용한 평가지표</div>
   <h2>우리가 사용한 평가지표</h2>
   <ul class="facts">
     <li>정확도: 시험 선수 중 포지션을 맞힌 비율</li>
@@ -194,7 +197,7 @@
 
 <!-- 8 결정 -->
 <section class="slide">
-  <div class="kicker">8 / 12 · 모델링 과정에서 우리 팀이 결정한 것</div>
+  <div class="kicker">8 / 16 · 모델링 과정에서 우리 팀이 결정한 것</div>
   <h2>모델링 과정에서 우리 팀이 결정한 것</h2>
   <ul class="facts">
     <li>첫 번째 포지션만 레이블로, 선수 복사 방식은 거절</li>
@@ -207,7 +210,7 @@
 
 <!-- 9 해석 -->
 <section class="slide">
-  <div class="kicker">9 / 12 · 최종 분석 결과에 대한 우리 팀의 해석</div>
+  <div class="kicker">9 / 16 · 최종 분석 결과에 대한 우리 팀의 해석</div>
   <h2>최종 분석 결과에 대한 우리 팀의 해석</h2>
   <div class="withimg">
     <div class="diagram plot"><div class="chart" id="g9"></div></div>
@@ -223,7 +226,7 @@
 
 <!-- 10 추가 연구 -->
 <section class="slide">
-  <div class="kicker">10 / 12 · 이후 추가로 연구한다면</div>
+  <div class="kicker">10 / 16 · 이후 추가로 연구한다면</div>
   <h2>이후 추가로 연구한다면 더 해 보고 싶은 것</h2>
   <table class="mini">
     <tr><th>구분</th><th>키워드</th></tr>
@@ -235,7 +238,7 @@
 
 <!-- 11 느낀 점 -->
 <section class="slide">
-  <div class="kicker">11 / 12 · 느끼고 배운 점</div>
+  <div class="kicker">11 / 16 · 느끼고 배운 점</div>
   <h2>AI를 활용하고 데이터를 분석하며 느끼고 배운 점</h2>
   <ul class="facts small-facts">
     <li>홍길동: "숫자가 올랐다고 좋아지는 게 아니라는 걸 직접 확인해서 뿌듯했다."</li>
@@ -245,9 +248,58 @@
   <p class="point">AI 활용에서 배운 것: <b>추천 모델도 직접 비교</b> · <b>기준선은 같은 시험 데이터로</b></p>
 </section>
 
-<!-- 12 마무리 -->
+<!-- 12~15 2부 · 모델 소개 (3분 발표) -->
+<section class="slide">
+  <div class="kicker">12 / 16 · 모델 소개 · 우리가 선택한 모델</div>
+  <h2>우리가 선택한 모델: 로지스틱 회귀</h2>
+  <ul class="facts small-facts">
+    <li>원리: 범주마다 계수를 곱해 더한 점수, 확률로 바꿔 가장 높은 범주</li>
+    <li>장점: 계수로 해석 (FW 쪽 슈팅 <b>+0.254</b>) · 범주별 확률도 계산</li>
+    <li>단점: 경계가 직선이라 휜 경계에 약함 · 입력끼리 관계가 강하면 해석 어려움</li>
+    <li>이런 상황에 좋음: 관계가 단순하고 분류 이유를 설명해야 할 때</li>
+    <li>우리 데이터: 정확도 <b>0.844</b> · macro F1 <b>0.845</b> · FW 재현율 <b>0.82</b></li>
+  </ul>
+</section>
+
+<section class="slide">
+  <div class="kicker">13 / 16 · 모델 소개 · 비교 모델 1</div>
+  <h2>비교 모델 1: k-NN(k=5)</h2>
+  <ul class="facts small-facts">
+    <li>원리: 능력치가 가장 가까운 선수 5명의 다수결</li>
+    <li>장점: 원리가 단순 · 따로 학습하는 과정 없음</li>
+    <li>단점: 척도(열의 단위)에 민감 · 분류 이유 설명 못함 · 데이터가 많으면 느림</li>
+    <li>이런 상황에 좋음: 입력이 적고 척도가 같으며 비슷한 사례가 많을 때</li>
+    <li>우리 데이터: 정확도 <b>0.856</b> · macro F1 <b>0.846</b> · FW 재현율 <b>0.76</b></li>
+  </ul>
+</section>
+
+<section class="slide">
+  <div class="kicker">14 / 16 · 모델 소개 · 비교 모델 2</div>
+  <h2>비교 모델 2: 결정 트리(깊이 4)</h2>
+  <ul class="facts small-facts">
+    <li>원리: "몇 점 이상인가" 질문으로 차례로 나눠 마지막 묶음의 다수 범주</li>
+    <li>장점: 규칙을 그대로 읽을 수 있음 · 척도 변환 불필요</li>
+    <li>단점: 깊어지면 과적합 · 경계가 계단 모양</li>
+    <li>이런 상황에 좋음: 사람이 따라 할 수 있는 규칙이 필요할 때</li>
+    <li>우리 데이터: 정확도 <b>0.781</b> · macro F1 <b>0.778</b> · FW 재현율 <b>0.73</b></li>
+  </ul>
+</section>
+
+<section class="slide">
+  <div class="kicker">15 / 16 · 모델 소개 · 세 모델 비교 요약</div>
+  <h2>세 모델 비교 요약</h2>
+  <table class="mini cmp">
+    <tr><th>모델</th><th>원리</th><th>장점</th><th>단점</th><th>적합한 상황</th><th>우리 데이터</th></tr>
+    <tr><td>로지스틱 회귀</td><td>계수의 합 → 확률</td><td>계수 해석</td><td>직선 경계</td><td>이유 설명</td><td><em>0.844</em></td></tr>
+    <tr><td>k-NN</td><td>가까운 5명 다수결</td><td>단순, 학습 없음</td><td>척도에 민감</td><td>사례가 많음</td><td>0.856</td></tr>
+    <tr><td>결정 트리</td><td>질문으로 나누기</td><td>규칙 읽기</td><td>과적합 · 계단 경계</td><td>규칙이 필요</td><td>0.781</td></tr>
+  </table>
+  <p class="point">우리 데이터에는 <b>로지스틱 회귀</b>: k-NN과 2명 차이보다 고른 재현율과 계수 해석</p>
+</section>
+
+<!-- 16 마무리 -->
 <section class="slide chapter">
-  <div class="kicker">12 / 12 · 마무리</div>
+  <div class="kicker">16 / 16 · 마무리</div>
   <h1>감사합니다</h1>
   <p class="sub">질문 받겠습니다</p>
   <p class="small">팀 FC25 · 홍길동 · 김영희 · 이철수</p>
