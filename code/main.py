@@ -6,7 +6,6 @@ import streamlit as st
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, confusion_matrix, precision_recall_fscore_support
 from sklearn.model_selection import train_test_split
-from sklearn.tree import DecisionTreeClassifier
 
 DATA = "data/eafc25_players.csv"
 FEATURES = ["pace", "shooting", "passing", "dribbling", "defending", "physic"]
@@ -15,6 +14,16 @@ KOR = {"pace": "속력", "shooting": "슈팅", "passing": "패스",
 ORDER = ["DF", "MF", "FW"]
 NAME = {"DF": "수비수(DF)", "MF": "미드필더(MF)", "FW": "공격수(FW)"}
 COLOR = {"DF": "#2b7fd6", "MF": "#2e9e6b", "FW": "#e0663a"}
+
+# 후보 모델 비교: code/check.py를 로컬에서 실행해 얻은 값(XGBoost는 브라우저 앱에 설치할 수 없어 표 전체를 적어 둔다)
+CANDIDATES = pd.DataFrame({
+    "모델": ["기준선(MF만 찍기)", "로지스틱 회귀(최종)", "k-NN(k=5)", "결정 트리(깊이 4)", "랜덤 포레스트(300그루)", "XGBoost(기본값)"],
+    "정확도": [0.450, 0.844, 0.856, 0.781, 0.850, 0.819],
+    "맞힌 인원": ["72명", "135명", "137명", "125명", "136명", "131명"],
+    "macro F1": ["", "0.845", "0.846", "0.778", "0.849", "0.813"],
+    "F1 (DF · MF · FW)": ["", "0.85 · 0.84 · 0.84", "0.92 · 0.85 · 0.77", "0.81 · 0.78 · 0.75", "0.87 · 0.84 · 0.84", "0.88 · 0.81 · 0.76"],
+    "재현율 (DF · MF · FW)": ["", "0.80 · 0.89 · 0.82", "0.89 · 0.88 · 0.76", "0.73 · 0.85 · 0.73", "0.82 · 0.90 · 0.79", "0.84 · 0.83 · 0.76"],
+})
 
 DF_POS = {"CB", "LB", "RB", "LWB", "RWB"}
 MF_POS = {"CDM", "CM", "CAM", "LM", "RM"}
@@ -47,13 +56,11 @@ def train(df):
     X_tr, X_te, y_tr, y_te = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
     majority = y_tr.value_counts().idxmax()
     logit = LogisticRegression(max_iter=2000).fit(X_tr, y_tr)
-    tree = DecisionTreeClassifier(max_depth=4, random_state=0).fit(X_tr, y_tr)
     pred = logit.predict(X_te)
     return {
         "majority": majority,
         "base_acc": (y_te == majority).mean(),
         "logit_acc": accuracy_score(y_te, pred),
-        "tree_acc": accuracy_score(y_te, tree.predict(X_te)),
         "cm": confusion_matrix(y_te, pred, labels=ORDER),
         "prf": precision_recall_fscore_support(y_te, pred, labels=ORDER, zero_division=0),
         "model": logit,
@@ -66,7 +73,7 @@ df = load()
 res = train(df)
 
 st.title("⚽ 능력치 여섯 개로 포지션을 맞힐 수 있을까")
-st.caption("FC25 선수 800명 · 분류(로지스틱 회귀) · 당곡고 데이터 과학 팀 프로젝트 샘플")
+st.caption("FC25 선수 800명 · 분류(로지스틱 회귀, 후보 모델 다섯 가지 비교) · 당곡고 데이터 과학 팀 프로젝트 샘플")
 
 tab1, tab2, tab3, tab4, tab5 = st.tabs(["① 질문", "② 데이터 보기", "③ 기준선", "④ 모델 결과", "⑤ 해석·한계"])
 
@@ -113,17 +120,25 @@ with tab3:
     st.write("모델이 이 값보다 높아야 능력치에서 무언가를 배웠다고 말할 수 있습니다.")
 
 with tab4:
-    st.subheader("정확도 비교")
-    acc = pd.DataFrame({
-        "방법": ["기준선(MF만 찍기)", "로지스틱 회귀(최종)", "결정 트리(확인용)"],
-        "정확도": [res["base_acc"], res["logit_acc"], res["tree_acc"]],
-    })
-    fig = px.bar(acc, x="방법", y="정확도", text_auto=".3f", color="방법",
-                 color_discrete_sequence=["#9aa3b5", "#2b7fd6", "#c7cedb"])
-    fig.update_layout(showlegend=False)
-    fig.update_yaxes(range=[0, 1])
+    st.subheader("후보 모델 비교")
+    st.write(f"이 앱에서 바로 계산한 값: 기준선 {res['base_acc']:.3f} · 로지스틱 회귀 {res['logit_acc']:.3f}")
+    st.table(CANDIDATES.assign(정확도=CANDIDATES["정확도"].map("{:.3f}".format)).set_index("모델"))
+    st.caption("표는 같은 학습 640명·시험 160명으로 code/check.py를 로컬에서 실행해 계산한 값입니다. XGBoost는 브라우저 앱에서 실행할 수 없습니다.")
+    fig = px.bar(CANDIDATES, x="정확도", y="모델", orientation="h", text_auto=".3f", color="모델",
+                 color_discrete_sequence=["#9aa3b5", "#2b7fd6", "#c7cedb", "#c7cedb", "#c7cedb", "#c7cedb"])
+    fig.update_layout(showlegend=False, yaxis={"autorange": "reversed"})
+    fig.update_xaxes(range=[0, 1])
     st.plotly_chart(fig, width="stretch")
-    st.caption("방법은 로지스틱 회귀 하나로 정했습니다. 결정 트리는 같은 분할에서 결과가 비슷한 수준인지 확인하는 데만 사용했습니다.")
+    st.markdown(
+        "**로지스틱 회귀를 고른 이유**\n"
+        "- k-NN(0.856)과 랜덤 포레스트(0.850)가 정확도는 더 높지만, 시험 160명 가운데 2명과 1명 차이입니다.\n"
+        "- 계수로 어느 능력치가 어느 포지션을 가르는지 읽을 수 있습니다. 수업 11차시에서 배운 모델입니다.\n"
+        "- F1이 세 포지션 모두 0.84~0.85로 고르고, FW 재현율 0.82는 다섯 모델 가운데 가장 높습니다."
+    )
+    coef = pd.DataFrame(res["model"].coef_, index=res["model"].classes_, columns=[KOR[f] for f in FEATURES]).reindex(ORDER)
+    st.subheader("로지스틱 회귀 계수")
+    st.write("능력치 1점이 오를 때 그 포지션 점수가 바뀌는 양입니다. 양수면 그 포지션일 가능성을 높이고, 음수면 낮춥니다.")
+    st.dataframe(coef.round(3), width="stretch")
 
     c1, c2 = st.columns(2)
     with c1:

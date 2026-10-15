@@ -7,6 +7,9 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, confusion_matrix, precision_recall_fscore_support
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.metrics import f1_score
 
 DATA = Path(__file__).resolve().parent.parent / "data" / "eafc25_players.csv"
 FEATURES = ["pace", "shooting", "passing", "dribbling", "defending", "physic"]
@@ -110,3 +113,34 @@ print("예측:", main["model"].predict(pd.DataFrame([avg], columns=FEATURES))[0]
 print("\n## 실험: CDM을 DF로 옮긴 경우")
 print("레이블 분포:", df["label_cdm"].value_counts().reindex(ORDER).to_dict())
 show(run(df, "label_cdm"), "CDM을 DF로 옮긴 레이블")
+
+print("\n## 후보 모델 비교 (본 분석 레이블, 같은 분할: 시험 20%·층화·분할 난수 42, 모델 난수 0)")
+# XGBoost는 로컬에서만 계산한다(stlite 앱에는 설치할 수 없어 앱은 이 출력값을 적어 보여 준다).
+from xgboost import XGBClassifier
+
+X, y = df[FEATURES], df["label"]
+X_tr, X_te, y_tr, y_te = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
+code_of = {c: i for i, c in enumerate(ORDER)}
+candidates = {
+    "로지스틱 회귀": LogisticRegression(max_iter=2000),
+    "k-NN(k=5)": KNeighborsClassifier(n_neighbors=5),
+    "결정 트리(깊이 4)": DecisionTreeClassifier(max_depth=4, random_state=0),
+    "랜덤 포레스트(300그루)": RandomForestClassifier(n_estimators=300, random_state=0),
+    "XGBoost(기본값)": XGBClassifier(random_state=0),
+}
+print("모델 | 정확도 | 맞힌 인원 | macro F1 | F1 DF·MF·FW | 재현율 DF·MF·FW")
+for name, m in candidates.items():
+    if name.startswith("XGBoost"):
+        m.fit(X_tr, y_tr.map(code_of))
+        pred = pd.Series(m.predict(X_te)).map(dict(enumerate(ORDER))).values
+    else:
+        m.fit(X_tr, y_tr)
+        pred = m.predict(X_te)
+    p, r, f, _ = precision_recall_fscore_support(y_te, pred, labels=ORDER, zero_division=0)
+    print(f"{name} | {accuracy_score(y_te, pred):.3f} | {int((pred == y_te.values).sum())}명"
+          f" | {f1_score(y_te, pred, average='macro'):.3f}"
+          f" | {' · '.join(f'{v:.2f}' for v in f)} | {' · '.join(f'{v:.2f}' for v in r)}")
+
+print("\n## 로지스틱 회귀 계수 (능력치 1점이 오를 때 그 포지션 점수가 바뀌는 양)")
+coef = pd.DataFrame(main["model"].coef_, index=main["model"].classes_, columns=FEATURES).reindex(ORDER)
+print(coef.round(3))
