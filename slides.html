@@ -103,6 +103,11 @@
   table.mini.cmp { font-size: clamp(14px, 1.6vw, 23px); width: 100%; }
   table.mini.cmp th, table.mini.cmp td { padding: 1.2vh .9vw; }
   table.mini.cmp td { white-space: nowrap; }
+  .steps { display: grid; grid-template-columns: 1fr 1fr; gap: 0 3vw; margin-top: 2.4vh; }
+  .steps ol { list-style: none; }
+  .steps li { font-size: clamp(15px, 1.7vw, 24px); margin: 1.5vh 0; line-height: 1.4; word-break: keep-all; padding-left: 1.6em; text-indent: -1.6em; }
+  .steps li .n { display: inline-block; min-width: 1.6em; text-indent: 0; color: var(--accent); font-weight: 800; }
+  .steps li .k { color: var(--accent2); font-weight: 800; margin-right: .4em; }
 </style>
 </head>
 <body>
@@ -146,13 +151,22 @@
 <section class="slide">
   <div class="kicker">4 / 17 · 어떤 과정으로 분석했는지</div>
   <h2>어떤 과정으로 분석했는지</h2>
-  <ul class="facts">
-    <li>데이터 판정, 선생님 승인 (3차시)</li>
-    <li>여러 포지션 선수 <b>533명(66.6%)</b> 발견, 레이블 규칙 (4~6차시)</li>
-    <li>분할과 기준선, 후보 모델 다섯 개 비교 (7~8차시)</li>
-    <li>혼동행렬과 범주별 지표 (9~10차시)</li>
-    <li>AI 반론 3가지, CDM 재배치 실험 (11~12차시)</li>
-  </ul>
+  <div class="steps">
+    <ol>
+      <li><span class="n">1</span><span class="k">수집</span>modudata CSV, 800명 · 14개 열</li>
+      <li><span class="n">2</span><span class="k">변수 선택</span>입력 능력치 6개 · 정답 포지션, overall 제외</li>
+      <li><span class="n">3</span><span class="k">전처리</span>결측 0 · 첫 포지션만 · DF · MF · FW 묶음</li>
+      <li><span class="n">4</span><span class="k">분할</span>640명 · 160명, 포지션 비율 유지, 난수 42</li>
+      <li><span class="n">5</span><span class="k">기준선</span>MF만 찍기, 정확도 0.450</li>
+    </ol>
+    <ol>
+      <li><span class="n">6</span><span class="k">후보 비교</span>모델 5종, 같은 분할 · 같은 지표</li>
+      <li><span class="n">7</span><span class="k">선택</span>차이 1~2명, 계수 해석 · FW 재현율 0.82</li>
+      <li><span class="n">8</span><span class="k">평가</span>정확도 0.844 · 범주별 F1, macro 0.845</li>
+      <li><span class="n">9</span><span class="k">해석</span>오답 25명 포지션 집계 · 능력치 하나 모델</li>
+      <li><span class="n">10</span><span class="k">한계 점검</span>애매한 레이블 232명 · CDM 재배치 · 교차검증 미실시</li>
+    </ol>
+  </div>
 </section>
 
 <!-- 5 고려한 모델 -->
@@ -180,7 +194,7 @@
     <li>계수로 읽는 능력치: DF 쪽 수비 <b>+0.200</b>, FW 쪽 슈팅 <b>+0.254</b></li>
     <li>k-NN <b>0.856</b> · 랜덤 포레스트 <b>0.850</b>이 더 높음, 160명 중 2명 · 1명 차이</li>
     <li>FW 재현율 <b>0.82</b>, 다섯 모델 중 최고</li>
-    <li>AI 추천 XGBoost: 우리 분할에서 <b>0.819</b></li>
+    <li>XGBoost: 우리 분할에서 <b>0.819</b>, 로지스틱 회귀보다 낮음</li>
   </ul>
 </section>
 
@@ -202,7 +216,7 @@
   <div class="kicker">8 / 17 · 모델링 과정에서 우리 팀이 결정한 것</div>
   <h2>모델링 과정에서 우리 팀이 결정한 것</h2>
   <ul class="facts">
-    <li>첫 번째 포지션만 레이블로, 선수 복사 방식은 거절</li>
+    <li>첫 번째 포지션만 레이블로, 한 선수는 한 줄만</li>
     <li>입력은 능력치 여섯 개만, overall · 몸값 · 나이 제외</li>
     <li>학습 640명 · 시험 160명, 포지션 비율 유지</li>
     <li>틀린 선수를 이상치로 빼지 않음</li>
