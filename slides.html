@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>팀 FC25 발표 · 능력치로 포지션 맞히기</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --bg: #0f1219; --bg-accent: #161b26;
+    --ink: #f2f4f8; --ink-dim: #8b93a7;
+    --accent: #ffd166; --accent2: #7cc7ff; --quote: #e8ecf4;
+  }
+  html, body { height: 100%; }
+  body { background: var(--bg); color: var(--ink);
+    font-family: "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", system-ui, sans-serif; overflow: hidden; }
+  .slide { position: absolute; inset: 0; display: none; flex-direction: column;
+    justify-content: center; padding: 6vh 9vw; line-height: 1.55; }
+  .slide.on { display: flex; }
+  .kicker { font-size: clamp(15px, 1.6vw, 22px); letter-spacing: .14em;
+    color: var(--accent); font-weight: 700; margin-bottom: 2.2vh; }
+  .kicker.blue { color: var(--accent2); }
+  h1 { font-size: clamp(34px, 4.6vw, 64px); font-weight: 800; line-height: 1.25; }
+  h2 { font-size: clamp(26px, 3.4vw, 48px); font-weight: 800; line-height: 1.35; }
+  .sub { margin-top: 3vh; font-size: clamp(17px, 1.9vw, 26px); color: var(--ink-dim); }
+  blockquote { font-size: clamp(21px, 2.6vw, 38px); font-weight: 700; color: var(--quote);
+    line-height: 1.5; max-width: 28em; }
+  blockquote::before { content: "\201C"; color: var(--accent); }
+  blockquote::after { content: "\201D"; color: var(--accent); }
+  .facts { margin-top: 1vh; }
+  .facts li { list-style: none; font-size: clamp(19px, 2.3vw, 33px); margin: 2.4vh 0;
+    padding-left: 1.2em; text-indent: -1.2em; }
+  .facts li::before { content: "\00B7  "; color: var(--accent2); font-weight: 800; }
+  .facts b { color: var(--accent2); font-weight: 800; }
+  .point { margin-top: 3.4vh; font-size: clamp(20px, 2.5vw, 36px); font-weight: 700; }
+  .point b { color: var(--accent); }
+  .small { margin-top: 2.6vh; font-size: clamp(15px, 1.6vw, 22px); color: var(--ink-dim); }
+  .prompt { margin-top: 3vh; background: #101d1a; border: 1px solid #24463d; border-radius: 14px;
+    padding: 2.6vh 2vw; font-family: "SFMono-Regular", "D2Coding", Menlo, monospace;
+    font-size: clamp(14px, 1.55vw, 22px); line-height: 1.7; color: #d7f0ea; max-width: 40em; overflow-wrap: break-word; }
+  table.mini { margin-top: 3vh; border-collapse: collapse; font-size: clamp(16px, 1.9vw, 27px); }
+  table.mini th, table.mini td { padding: 1.2vh 1.4vw; border-bottom: 1px solid #2a3244; text-align: left; }
+  table.mini th { color: var(--accent); font-weight: 800; }
+  table.mini td:first-child { font-weight: 800; white-space: nowrap; }
+  table.mini td em { color: var(--accent2); font-style: normal; font-weight: 800; }
+  .split { margin-top: 3.4vh; display: flex; gap: 3vw; flex-wrap: wrap; }
+  .card { border: 1.5px solid #2a3244; border-radius: 16px; padding: 2.4vh 2vw; min-width: 15em; }
+  .card .t { color: var(--accent); font-weight: 800; font-size: clamp(16px, 1.8vw, 24px); }
+  .card .v { margin-top: 1.2vh; font-size: clamp(30px, 4vw, 58px); font-weight: 800; }
+  .card .d { margin-top: 1vh; color: var(--ink-dim); font-size: clamp(14px, 1.5vw, 20px); }
+  .withimg { display: flex; gap: 3vw; align-items: center; margin-top: 2vh; }
+  .withimg .txt { flex: 1 1 0; min-width: 0; }
+  .withimg img { max-height: 58vh; max-width: 32vw; border-radius: 14px; border: 1px solid #2a3244; object-fit: cover; }
+  .shot.tall img { max-height: 64vh; width: auto; margin: 0 auto; display: block; }
+  .shot.wide img { max-height: 46vh; width: auto; max-width: 100%; margin: 0 auto; display: block; }
+  .src { margin-top: 1.4vh; font-size: clamp(12px, 1.2vw, 16px); color: var(--ink-dim); }
+  .diagram { margin-top: 3vh; background: #f7f3e8; border-radius: 16px; padding: 2vh 1.4vw; overflow-x: auto; }
+  .diagram.short svg { max-height: var(--dh, 40vh); }
+  /* 인터랙티브 위젯 — 밝은 상자 안 */
+  .widget { color: #1c2230; }
+  .diagram .widget svg { width: auto; max-width: 100%; max-height: var(--wh, 44vh); height: auto; display: block; margin: 0 auto; }
+  .wctl { display: flex; flex-wrap: wrap; align-items: center; gap: .8vh 1.4vw; margin-top: 1.2vh;
+          font-size: clamp(14px, 1.5vw, 20px); font-weight: 700; }
+  .wctl label { display: flex; align-items: center; gap: .6vw; white-space: nowrap; }
+  .wctl input[type=range] { width: clamp(120px, 16vw, 260px); accent-color: #2b7fd6; }
+  .wbtn { border: 1.5px solid #c9c2b2; background: #fff; color: #1c2230; border-radius: 999px;
+          padding: .5vh 1.2vw; font: inherit; font-weight: 700; cursor: pointer; }
+  .wbtn.on { background: #2b7fd6; border-color: #2b7fd6; color: #fff; }
+  .wout { margin-left: auto; color: #b07a00; font-variant-numeric: tabular-nums; }
+  .diagram svg { width: auto; max-width: 100%; max-height: 50vh; height: auto; display: block; margin: 0 auto; }
+  .chapter { background: radial-gradient(ellipse at 20% 110%, #1c2434 0%, var(--bg) 60%); }
+  .foot span { white-space: nowrap; }
+  .foot { position: absolute; bottom: 3.4vh; left: 9vw; right: 9vw;
+    display: flex; justify-content: space-between; align-items: center;
+    color: var(--ink-dim); font-size: clamp(12px, 1.2vw, 16px); }
+  .dots { display: flex; gap: 6px; }
+  .dots i { width: 7px; height: 7px; border-radius: 50%; background: #333c4e; }
+  .dots i.here { background: var(--accent); }
+  .hint { position: absolute; top: 3.2vh; right: 4vw; color: var(--ink-dim);
+    font-size: clamp(11px, 1.1vw, 14px); }
+@media (max-width: 760px) { .dots { display: none; } }
+</style>
+<style>
+  .kicker { letter-spacing: .06em; }
+  .bars { margin-top: 3vh; display: flex; flex-direction: column; gap: 2vh; max-width: 46em; }
+  .bar { display: grid; grid-template-columns: 12em 1fr 4em; align-items: center; gap: 1.2vw;
+         font-size: clamp(15px, 1.7vw, 23px); }
+  .bar .track { background: #1c2333; border-radius: 8px; height: 4.2vh; overflow: hidden; }
+  .bar .fill { height: 100%; border-radius: 8px; background: #5b6478; }
+  .bar .fill.main { background: var(--accent2); }
+  .bar .num { font-weight: 800; text-align: right; }
+  table.cm { border-collapse: collapse; font-size: clamp(15px, 1.7vw, 23px); }
+  table.cm th, table.cm td { padding: 1vh 1.2vw; text-align: center; }
+  table.cm th { color: var(--ink-dim); font-weight: 700; }
+  table.cm td { font-weight: 800; border-radius: 6px; }
+  .cols { display: flex; gap: 3.4vw; align-items: flex-start; margin-top: 2.6vh; flex-wrap: wrap; }
+  .cols > div { flex: 1 1 0; min-width: 0; }
+  .lab { color: var(--accent); font-weight: 800; font-size: clamp(14px, 1.5vw, 20px); margin-bottom: 1.2vh; }
+  .facts.tight li { margin: 1.4vh 0; font-size: clamp(16px, 1.8vw, 25px); }
+  table.mini.sm { font-size: clamp(14px, 1.55vw, 21px); margin-top: 1vh; }
+  table.mini.sm th, table.mini.sm td { padding: .9vh 1.1vw; }
+  .qbank { margin-top: 3.4vh; color: var(--ink-dim); font-size: clamp(13px, 1.3vw, 18px); line-height: 1.7; }
+  .qbank b { color: var(--ink); }
+</style>
+</head>
+<body>
+
+<!-- 1 제목 -->
+<section class="slide cover chapter">
+  <div class="kicker">1 / 9 · 제목</div>
+  <h1>능력치 여섯 개만 보고<br>선수의 포지션을 맞힐 수 있는가</h1>
+  <p class="sub">팀 FC25 · 10101 홍길동 · 10102 김영희 · 10103 이철수</p>
+  <p class="small">FC25 선수 800명 · 분류(로지스틱 회귀) · 당곡고 데이터 과학 팀 프로젝트(선생님이 만든 가상 팀의 샘플)</p>
+</section>
+
+<!-- 2 왜 -->
+<section class="slide">
+  <div class="kicker">2 / 9 · 왜 이 주제인가</div>
+  <h2>게임에서 느끼던 감을 데이터로 확인</h2>
+  <ul class="facts">
+    <li>선수 카드의 <b>능력치 모양</b>만 봐도 포지션이 짐작되는 경험</li>
+    <li>그 감이 실제 데이터로도 확인되는지 궁금했습니다</li>
+    <li>정답(포지션)이 데이터에 있어 수업에서 배운 <b>분류</b>로 확인 가능</li>
+  </ul>
+  <p class="point">질문의 범위: 능력치 <b>여섯 개만</b> (종합 능력치·몸값·나이 제외)</p>
+</section>
+
+<!-- 3 데이터 -->
+<section class="slide">
+  <div class="kicker">3 / 9 · 데이터</div>
+  <h2>FC25 선수 800명 · 14열</h2>
+  <ul class="facts tight">
+    <li>출처: modudata 사본 <span style="color:var(--ink-dim)">(raw.githubusercontent.com/greatsong/modudata/main/data/eafc25_players.csv)</span></li>
+    <li>종합 능력치 77~91의 상위 800명 · 2026-10-15에 받음</li>
+    <li>입력 변수: <b>속력 · 슈팅 · 패스 · 드리블 · 수비 · 피지컬</b> (빈칸 0개)</li>
+    <li>정답: positions 열을 DF · MF · FW 세 묶음으로 변환</li>
+    <li>공개된 프로 선수의 게임 능력치 · 사적 정보 없음</li>
+  </ul>
+</section>
+
+<!-- 4 구멍과 전처리 -->
+<section class="slide">
+  <div class="kicker">4 / 9 · 데이터에서 찾은 구멍과 전처리 판단</div>
+  <h2>포지션이 여러 개 적힌 선수 533명(66.6%)</h2>
+  <div class="cols">
+    <div>
+      <div class="lab">우리의 판단</div>
+      <ul class="facts tight">
+        <li>"RM,RW"처럼 쉼표로 여러 개 기재</li>
+        <li><b>첫 번째 포지션만 사용</b> (주 포지션)</li>
+        <li>같은 선수를 포지션마다 복사하는 방법은 거절 (학습·시험에 같은 선수가 들어감)</li>
+        <li>골키퍼는 <b>0명</b> → 세 범주 분류</li>
+      </ul>
+    </div>
+    <div>
+      <div class="lab">레이블 분포</div>
+      <table class="mini sm">
+        <tr><th>묶음</th><th>첫 포지션</th><th>인원</th></tr>
+        <tr><td>DF</td><td>CB · LB · RB · LWB · RWB</td><td><em>274</em></td></tr>
+        <tr><td>MF</td><td>CDM · CM · CAM · LM · RM</td><td><em>363</em></td></tr>
+        <tr><td>FW</td><td>ST · LW · RW</td><td><em>163</em></td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- 5 방법과 기준선 -->
+<section class="slide">
+  <div class="kicker">5 / 9 · 방법과 기준선</div>
+  <h2>로지스틱 회귀 하나 · 기준선은 MF만 찍기</h2>
+  <ul class="facts">
+    <li>학습 <b>640명</b> · 시험 <b>160명</b> (20%, 포지션 비율 유지, 분할 난수 42)</li>
+    <li>기준선: 학습 데이터에서 가장 많은 <b>MF</b>를 모든 선수에게 답하기</li>
+    <li>기준선 정확도 <b>0.450</b> (시험 160명 중 72명)</li>
+    <li>결정 트리(깊이 4)는 결과 수준 확인용으로만 사용</li>
+  </ul>
+</section>
+
+<!-- 6 결과 -->
+<section class="slide">
+  <div class="kicker">6 / 9 · 결과</div>
+  <h2>정확도 0.844 · 기준선보다 0.394 높음</h2>
+  <div class="cols">
+    <div>
+      <div class="bars" style="margin-top:1vh">
+        <div class="bar"><span>기준선(MF만)</span><div class="track"><div class="fill" style="width:45.0%"></div></div><span class="num">0.450</span></div>
+        <div class="bar"><span>로지스틱(최종)</span><div class="track"><div class="fill main" style="width:84.4%"></div></div><span class="num">0.844</span></div>
+        <div class="bar"><span>결정 트리(확인)</span><div class="track"><div class="fill" style="width:78.1%"></div></div><span class="num">0.781</span></div>
+      </div>
+      <table class="mini sm" style="margin-top:3vh">
+        <tr><th>포지션</th><th>정밀도</th><th>재현율</th><th>F1</th></tr>
+        <tr><td>DF</td><td>0.92</td><td>0.80</td><td>0.85</td></tr>
+        <tr><td>MF</td><td>0.79</td><td>0.89</td><td>0.84</td></tr>
+        <tr><td>FW</td><td>0.87</td><td>0.82</td><td>0.84</td></tr>
+      </table>
+    </div>
+    <div style="flex:0 0 auto">
+      <div class="lab">혼동행렬 (시험 160명)</div>
+      <table class="cm"><tr><th></th><th>예측 DF</th><th>예측 MF</th><th>예측 FW</th></tr><tr><th>실제 DF</th><td style="background:rgba(124,199,255,0.64);color:#0f1219">44</td><td style="background:rgba(124,199,255,0.25);color:#f2f4f8">11</td><td style="background:rgba(124,199,255,0.12);color:#f2f4f8">0</td></tr><tr><th>실제 MF</th><td style="background:rgba(124,199,255,0.17);color:#f2f4f8">4</td><td style="background:rgba(124,199,255,0.87);color:#0f1219">64</td><td style="background:rgba(124,199,255,0.17);color:#f2f4f8">4</td></tr><tr><th>실제 FW</th><td style="background:rgba(124,199,255,0.12);color:#f2f4f8">0</td><td style="background:rgba(124,199,255,0.19);color:#f2f4f8">6</td><td style="background:rgba(124,199,255,0.44);color:#f2f4f8">27</td></tr></table>
+      <p class="small" style="margin-top:1.6vh">FW와 DF 사이 오답 <b style="color:var(--accent)">0명</b></p>
+    </div>
+  </div>
+</section>
+
+<!-- 7 해석 -->
+<section class="slide">
+  <div class="kicker">7 / 9 · 해석</div>
+  <h2>틀린 25명은 모두 MF와의 경계</h2>
+  <ul class="facts tight">
+    <li>정확도 0.844: 시험 선수 100명 중 84명쯤의 포지션을 맞힘</li>
+    <li>DF 정밀도 0.92: 모델이 DF라고 답한 48명 중 44명이 실제 DF</li>
+    <li>틀린 25명 중 <b>풀백 9 · 윙어 7 · 수비형 미드필더 3</b></li>
+    <li>AI 반론 수용: 적힌 포지션이 두 묶음 이상인 선수 <b>232명(29.0%)</b>, 레이블 자체가 애매할 가능성</li>
+    <li>AI 제안 거절: 종합 능력치 추가 (질문 범위 밖)</li>
+    <li>CDM을 DF로 옮긴 실험: 정확도 0.856, 기준선보다 높은 정도는 <b>0.394로 동일</b>, FW 재현율 <b>0.82 → 0.64</b></li>
+  </ul>
+</section>
+
+<!-- 8 한계 -->
+<section class="slide">
+  <div class="kicker">8 / 9 · 한계</div>
+  <h2>이 결과를 그대로 믿기 어려운 이유</h2>
+  <ul class="facts tight">
+    <li>상위 800명만 있는 표본 · 골키퍼 0명</li>
+    <li>정답은 게임 제작사가 정한 분류</li>
+    <li>여러 포지션 선수 533명(66.6%)을 첫 포지션 하나로 줄임</li>
+    <li>시험 FW 33명: 한 명 차이로 재현율 0.03 변화</li>
+    <li>묶는 기준에 따라 FW 재현율 0.82 또는 0.64</li>
+  </ul>
+  <p class="point">오용 주의: <b>이 모델로 실제 선수의 포지션을 정하면 안 됩니다</b></p>
+</section>
+
+<!-- 9 질문 -->
+<section class="slide chapter">
+  <div class="kicker">9 / 9 · 질문 받겠습니다</div>
+  <h1>질문 받겠습니다</h1>
+  <p class="sub">앱: index.html · 코드와 기록: 저장소 code/ · log/</p>
+  <div class="qbank">
+    <b>공개 질문 은행</b><br>
+    ① 이 그래프(또는 숫자)는 무엇을 뜻합니까 · ② 기준선보다 얼마나 나아졌습니까 · ③ 이 결과를 믿을 수 없는 이유 하나<br>
+    ④ 이 결과에서 새로 알게 된 것 · ⑤ 주제를 왜 이것으로 정했습니까
+  </div>
+</section>
+
+<div class="hint">← → 이동 · Home 처음으로</div>
+<div class="foot">
+  <span>팀 FC25 · 데이터 과학 팀 프로젝트</span>
+  <div class="dots" id="dots"></div>
+  <span id="pageno"></span>
+</div>
+
+<script>
+  const slides = [...document.querySelectorAll('.slide')];
+  const dots = document.getElementById('dots');
+  slides.forEach(() => dots.appendChild(document.createElement('i')));
+  let cur = 0;
+  function show(i) {
+    cur = Math.max(0, Math.min(slides.length - 1, i));
+    slides.forEach((s, k) => s.classList.toggle('on', k === cur));
+    [...dots.children].forEach((d, k) => d.classList.toggle('here', k === cur));
+    document.getElementById('pageno').textContent = (cur + 1) + ' / ' + slides.length;
+  }
+  addEventListener('keydown', e => {
+    if (e.target.matches('input, select, textarea, button')) return;   // 위젯 조작 중에는 넘기지 않음
+    if (['ArrowRight', ' ', 'PageDown'].includes(e.key)) show(cur + 1);
+    if (['ArrowLeft', 'PageUp'].includes(e.key)) show(cur - 1);
+    if (e.key === 'Home') show(0);
+  });
+  addEventListener('click', e => { if (e.target.closest('a, .widget')) return; show(cur + (e.clientX > innerWidth / 2 ? 1 : -1)); });
+  show(0);
+</script>
+</body>
+</html>
