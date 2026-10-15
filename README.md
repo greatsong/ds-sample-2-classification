@@ -154,14 +154,14 @@ positions 열은 "RM,RW"처럼 포지션이 쉼표로 여러 개 적혀 있습�
 - 10103 이철수: AI 설명만 믿었으면 positions 열을 잘못 이해할 뻔했다. 모델이 틀린 것이 아니라 정답이 애매한 것일 수도 있다는 점을 알게 됐다.
 
 ## 생성형 AI 활용 명시
-- 사용한 AI: 대화형 AI 도구
+- 사용한 AI 모델: Claude Fable 5.1(Anthropic). 이 샘플은 선생님이 이 모델로 만들었습니다. 실제 팀은 사용한 모델 이름과 버전(예: ChatGPT GPT-5, Gemini 2.5, Claude 등)을 그대로 적습니다.
 - 사용한 곳: 앱 코드 작성, 우리 해석에 대한 반론 요청, 문구 다듬기
 - 사용하지 않은 곳: 주제를 고른 이유, 결과 해석, 결론은 팀이 직접 썼습니다.
 - 검증 방법: 모든 수치는 `code/check.py`로 다시 계산해 대조했습니다. AI 제안을 받아들이지 않은 기록(XGBoost 추천, overall 추가 제안 등)은 `log/`에 있습니다.
 
 ## 참고문헌
 1. EA SPORTS FC 25 선수 능력치(EA Sports, 2024-25 시즌). 공개 페이지(sofifa.com)를 정리한 GitHub mzafram2001/ea-fc `dataset_ea_fc_25.csv`(MIT 라이선스), 2026-10-15 접근. 수업용 사본: github.com/greatsong/modudata `eafc25_players.csv`(상위 800명)
-2. 사용한 소프트웨어: Python 3.11, pandas 2.3.3, scikit-learn 1.8.0, plotly 6.6.0, Streamlit 1.53.1, xgboost 3.2.0, stlite 1.4.0
+2. 사용한 소프트웨어: Python 3.11, pandas 2.3.3, scikit-learn 1.8.0, plotly 6.6.0, Streamlit 1.53.1, xgboost 3.2.0, stlite 1.4.0 · 생성형 AI: Claude Fable 5.1(Anthropic)
 3. 『데이터 과학』(2022 개정 교육과정 고등학교 교과서)
 
 ## 실행 방법
