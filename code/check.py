@@ -144,3 +144,56 @@ for name, m in candidates.items():
 print("\n## 로지스틱 회귀 계수 (능력치 1점이 오를 때 그 포지션 점수가 바뀌는 양)")
 coef = pd.DataFrame(main["model"].coef_, index=main["model"].classes_, columns=FEATURES).reindex(ORDER)
 print(coef.round(3))
+
+print("\n## 인사이트 (README '우리 팀이 찾아낸 것'의 근거)")
+model = main["model"]
+X_te_main = X.loc[y_te.index]
+pred_main = model.predict(X_te_main)
+te = df.loc[y_te.index].copy()
+te["pred"] = pred_main
+
+print("\n### 인사이트 1: 수비가 높다고 수비수가 아니다")
+df_min = int(df.loc[df["label"] == "DF", "defending"].min())
+high_def = df[df["defending"] >= df_min]
+print(f"DF 274명의 수비 능력치 최솟값: {df_min} (DF 전원이 수비 {df_min} 이상)")
+print(f"수비 {df_min} 이상인 선수: {len(high_def)}명 · 그중 DF {int((high_def['label'] == 'DF').sum())}명"
+      f"({(high_def['label'] == 'DF').mean():.1%}) · MF {int((high_def['label'] == 'MF').sum())}명"
+      f" · FW {int((high_def['label'] == 'FW').sum())}명")
+print("예시:", df.loc[df["name"] == "Rodri", ["name", "positions", "label", "defending"]].to_dict("records"))
+print("능력치 하나만 넣은 로지스틱 회귀(같은 분할)")
+for col in FEATURES:
+    one = LogisticRegression(max_iter=2000).fit(X_tr[[col]], y_tr)
+    p1 = one.predict(X_te[[col]])
+    r1 = precision_recall_fscore_support(y_te, p1, labels=ORDER, zero_division=0)[1]
+    print(f"  {col}: 정확도 {accuracy_score(y_te, p1):.3f} · 재현율 DF {r1[0]:.2f} · MF {r1[1]:.2f} · FW {r1[2]:.2f}")
+print("DF 계수(크기 순):", coef.loc["DF"].reindex(coef.loc["DF"].abs().sort_values(ascending=False).index).round(3).to_dict())
+
+print("\n### 인사이트 2: 틀린 선수는 경계 포지션, 특히 공격형 풀백")
+fine = {"풀백(LB·RB)": {"LB", "RB"}, "센터백(CB)": {"CB"}, "CDM": {"CDM"},
+        "윙어(LW·RW·LM·RM)": {"LW", "RW", "LM", "RM"}, "CM·CAM": {"CM", "CAM"}, "ST": {"ST"}}
+for name, s in fine.items():
+    t = te[te["first_pos"].isin(s)]
+    n_wrong = int((t["pred"] != t["label"]).sum())
+    print(f"  시험 {name}: {len(t)}명 중 {n_wrong}명 틀림({n_wrong / len(t):.0%})")
+edge = {"LB", "RB", "LW", "RW", "LM", "RM", "CDM"}
+wrong = te[te["pred"] != te["label"]]
+print(f"틀린 {len(wrong)}명 중 풀백·윙어·CDM: {int(wrong['first_pos'].isin(edge).sum())}명")
+print("틀린 풀백:")
+print(wrong[wrong["first_pos"].isin({"LB", "RB"})][["name", "positions", "pred"] + FEATURES].to_string(index=False))
+centers = df.groupby("label")[FEATURES].mean()
+df["fine"] = df["first_pos"].map(lambda p: "FB" if p in {"LB", "RB"} else p)
+fine_means = df.groupby("fine")[FEATURES].mean()
+print("세부 포지션 평균에서 DF·MF·FW 평균까지의 거리(여섯 능력치 차이의 제곱합의 제곱근)")
+for g in ["CB", "FB", "CDM", "CM"]:
+    d = {c: round(float(((fine_means.loc[g] - centers.loc[c]) ** 2).sum() ** 0.5), 1) for c in ORDER}
+    print(f"  {g}: {d}")
+
+print("\n### 인사이트 3: MF는 가장 평평하고, 헷갈리는 선수가 MF로 모인다")
+print("포지션별 평균 능력치 여섯 개의 표준편차:",
+      centers.std(axis=1, ddof=0).reindex(ORDER).round(1).to_dict())
+into_mf = te[(te["pred"] == "MF") & (te["label"] != "MF")]
+print(f"MF로 잘못 답한 선수: {len(into_mf)}명 (틀린 {len(wrong)}명 중) · DF {int((into_mf['label'] == 'DF').sum())}명"
+      f" · FW {int((into_mf['label'] == 'FW').sum())}명")
+print(f"실제 MF {int((te['label'] == 'MF').sum())}명 중 맞힘 {int(((te['label'] == 'MF') & (te['pred'] == 'MF')).sum())}명")
+print("MF로 잘못 답한 FW:")
+print(into_mf[into_mf["label"] == "FW"][["name", "positions"] + FEATURES].to_string(index=False))

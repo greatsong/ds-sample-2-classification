@@ -94,6 +94,8 @@
   .qbank { margin-top: 3.4vh; padding-left: 1.4em; color: var(--ink-dim); font-size: clamp(13px, 1.35vw, 18px); line-height: 1.8; }
 </style>
 <style>
+  .insight li span { display: block; font-size: .78em; color: #c9cfdb; margin-top: .6vh; }
+  .insight li { margin: 2vh 0; }
   .withimg .plot { margin-top: 0; flex: 0 0 auto; padding: 1.4vh 1vw; }
   .chart { width: 38vw; height: 46vh; }
   .nw { white-space: nowrap; }
@@ -107,7 +109,7 @@
 
 <!-- 1 제목 -->
 <section class="slide chapter">
-  <div class="kicker">1 / 16 · 제목</div>
+  <div class="kicker">1 / 17 · 제목</div>
   <h1>능력치 여섯 개만 보고<br>선수의 포지션을 맞힐 수 있는가</h1>
   <p class="sub">팀 FC25 · 10101 홍길동 · 10102 김영희 · 10103 이철수</p>
   <p class="small">선생님이 만든 가상 팀의 샘플 · 데이터와 수치는 실제 계산값</p>
@@ -115,7 +117,7 @@
 
 <!-- 2 데이터셋 -->
 <section class="slide">
-  <div class="kicker">2 / 16 · 우리 팀의 데이터셋</div>
+  <div class="kicker">2 / 17 · 우리 팀의 데이터셋</div>
   <h2>우리 팀의 데이터셋</h2>
   <div class="withimg">
     <ul class="facts txt">
@@ -130,7 +132,7 @@
 
 <!-- 3 선택 이유 -->
 <section class="slide">
-  <div class="kicker">3 / 16 · 이 문제를 선택한 이유</div>
+  <div class="kicker">3 / 17 · 이 문제를 선택한 이유</div>
   <h2>이 문제를 선택한 이유</h2>
   <ul class="facts">
     <li>셋 다 축구 게임으로 선수단을 짜 본 경험</li>
@@ -142,7 +144,7 @@
 
 <!-- 4 과정 -->
 <section class="slide">
-  <div class="kicker">4 / 16 · 어떤 과정으로 분석했는지</div>
+  <div class="kicker">4 / 17 · 어떤 과정으로 분석했는지</div>
   <h2>어떤 과정으로 분석했는지</h2>
   <ul class="facts">
     <li>데이터 판정, 선생님 승인 (3차시)</li>
@@ -155,7 +157,7 @@
 
 <!-- 5 고려한 모델 -->
 <section class="slide">
-  <div class="kicker">5 / 16 · 어떤 모델을 고려했는지</div>
+  <div class="kicker">5 / 17 · 어떤 모델을 고려했는지</div>
   <h2>어떤 모델을 고려했는지</h2>
   <table class="mini">
     <tr><th>모델</th><th>정확도</th><th>macro F1</th><th>FW 재현율</th></tr>
@@ -171,7 +173,7 @@
 
 <!-- 6 선택 이유 -->
 <section class="slide">
-  <div class="kicker">6 / 16 · 왜 이 모델을 선택했는지</div>
+  <div class="kicker">6 / 17 · 왜 이 모델을 선택했는지</div>
   <h2>왜 이 모델을 선택했는지</h2>
   <ul class="facts">
     <li>최종: 로지스틱 회귀, 수업 11차시에서 배운 모델</li>
@@ -184,7 +186,7 @@
 
 <!-- 7 평가지표 -->
 <section class="slide">
-  <div class="kicker">7 / 16 · 우리가 사용한 평가지표</div>
+  <div class="kicker">7 / 17 · 우리가 사용한 평가지표</div>
   <h2>우리가 사용한 평가지표</h2>
   <ul class="facts">
     <li>정확도: 시험 선수 중 포지션을 맞힌 비율</li>
@@ -197,7 +199,7 @@
 
 <!-- 8 결정 -->
 <section class="slide">
-  <div class="kicker">8 / 16 · 모델링 과정에서 우리 팀이 결정한 것</div>
+  <div class="kicker">8 / 17 · 모델링 과정에서 우리 팀이 결정한 것</div>
   <h2>모델링 과정에서 우리 팀이 결정한 것</h2>
   <ul class="facts">
     <li>첫 번째 포지션만 레이블로, 선수 복사 방식은 거절</li>
@@ -210,23 +212,35 @@
 
 <!-- 9 해석 -->
 <section class="slide">
-  <div class="kicker">9 / 16 · 최종 분석 결과에 대한 우리 팀의 해석</div>
+  <div class="kicker">9 / 17 · 최종 분석 결과에 대한 우리 팀의 해석</div>
   <h2>최종 분석 결과에 대한 우리 팀의 해석</h2>
   <div class="withimg">
     <div class="diagram plot"><div class="chart" id="g9"></div></div>
-    <ul class="facts txt">
-      <li>FW와 DF 사이 오답 <b>0명</b></li>
-      <li>틀린 <b>25명</b> 전부 MF와의 경계</li>
-      <li>그중 풀백 <b>9</b> · 윙어 <b>7</b> · CDM <b>3</b></li>
-      <li>두 묶음 이상에 걸친 선수 <b>232명(29.0%)</b>, 정답 자체가 애매</li>
+    <ul class="facts txt small-facts insight">
+      <li><b>수비 높음 ≠ 수비수</b><span>수비 69↑ 중 DF <b>60.0%</b> · 슈팅 <b>0.731</b> &gt; 수비 <b>0.669</b></span></li>
+      <li><b>놓친 수비수는 공격형 풀백</b><span>풀백 <b>9/23명</b> 오답 · 센터백 <b>2/32명</b> · 칸셀루 · 데이비스</span></li>
+      <li><b>헷갈리는 선수가 MF로</b><span>오답 25명 중 <b>17명</b>이 MF 예측 · 이강인 · 그리즈만</span></li>
     </ul>
   </div>
   <p class="small">오용 주의: 이 모델로 실제 선수의 포지션을 정하면 안 됨</p>
 </section>
 
-<!-- 10 추가 연구 -->
+<!-- 10 찾아낸 것 -->
 <section class="slide">
-  <div class="kicker">10 / 16 · 이후 추가로 연구한다면</div>
+  <div class="kicker">10 / 17 · 우리 팀이 찾아낸 것</div>
+  <h2>우리 팀이 찾아낸 것</h2>
+  <table class="mini cmp">
+    <tr><th>발견</th><th>처음 생각</th><th>이 데이터에서는</th></tr>
+    <tr><td>수비수를 가른 것</td><td>수비 능력치 하나면 충분</td><td>슈팅 · 드리블이 낮은 쪽, 로드리는 수비 <em>87</em>의 MF</td></tr>
+    <tr><td>놓친 수비수</td><td>풀백 전체가 MF에 가까움</td><td>평균 풀백은 DF 쪽(거리 <em>13.7</em> 대 <em>19.8</em>), 공격형 풀백만</td></tr>
+    <tr><td>미드필더</td><td>가장 애매, 가장 많이 틀림</td><td>MF 재현율 <em>0.89</em> 최고, 능력치가 가장 고름(<em>5.4</em>)</td></tr>
+  </table>
+  <p class="point">포지션은 잘하는 것과 <b>덜 하는 것</b>으로 함께 구분됨</p>
+</section>
+
+<!-- 11 추가 연구 -->
+<section class="slide">
+  <div class="kicker">11 / 17 · 이후 추가로 연구한다면</div>
   <h2>이후 추가로 연구한다면 더 해 보고 싶은 것</h2>
   <table class="mini">
     <tr><th>구분</th><th>키워드</th></tr>
@@ -236,9 +250,9 @@
   </table>
 </section>
 
-<!-- 11 느낀 점 -->
+<!-- 12 느낀 점 -->
 <section class="slide">
-  <div class="kicker">11 / 16 · 느끼고 배운 점</div>
+  <div class="kicker">12 / 17 · 느끼고 배운 점</div>
   <h2>AI를 활용하고 데이터를 분석하며 느끼고 배운 점</h2>
   <ul class="facts small-facts">
     <li>홍길동: "숫자가 올랐다고 좋아지는 게 아니라는 걸 직접 확인해서 뿌듯했다."</li>
@@ -248,9 +262,9 @@
   <p class="point">AI 활용에서 배운 것: <b>추천 모델도 직접 비교</b> · <b>기준선은 같은 시험 데이터로</b></p>
 </section>
 
-<!-- 12~15 2부 · 모델 소개 (3분 발표) -->
+<!-- 13~16 2부 · 모델 소개 (3분 발표) -->
 <section class="slide">
-  <div class="kicker">12 / 16 · 모델 소개 · 우리가 선택한 모델</div>
+  <div class="kicker">13 / 17 · 모델 소개 · 우리가 선택한 모델</div>
   <h2>우리가 선택한 모델: 로지스틱 회귀</h2>
   <ul class="facts small-facts">
     <li>원리: 범주마다 계수를 곱해 더한 점수, 확률로 바꿔 가장 높은 범주</li>
@@ -262,7 +276,7 @@
 </section>
 
 <section class="slide">
-  <div class="kicker">13 / 16 · 모델 소개 · 비교 모델 1</div>
+  <div class="kicker">14 / 17 · 모델 소개 · 비교 모델 1</div>
   <h2>비교 모델 1: k-NN(k=5)</h2>
   <ul class="facts small-facts">
     <li>원리: 능력치가 가장 가까운 선수 5명의 다수결</li>
@@ -274,7 +288,7 @@
 </section>
 
 <section class="slide">
-  <div class="kicker">14 / 16 · 모델 소개 · 비교 모델 2</div>
+  <div class="kicker">15 / 17 · 모델 소개 · 비교 모델 2</div>
   <h2>비교 모델 2: 결정 트리(깊이 4)</h2>
   <ul class="facts small-facts">
     <li>원리: "몇 점 이상인가" 질문으로 차례로 나눠 마지막 묶음의 다수 범주</li>
@@ -286,7 +300,7 @@
 </section>
 
 <section class="slide">
-  <div class="kicker">15 / 16 · 모델 소개 · 세 모델 비교 요약</div>
+  <div class="kicker">16 / 17 · 모델 소개 · 세 모델 비교 요약</div>
   <h2>세 모델 비교 요약</h2>
   <table class="mini cmp">
     <tr><th>모델</th><th>원리</th><th>장점</th><th>단점</th><th>적합한 상황</th><th>우리 데이터</th></tr>
@@ -297,9 +311,9 @@
   <p class="point">우리 데이터에는 <b>로지스틱 회귀</b>: k-NN과 2명 차이보다 고른 재현율과 계수 해석</p>
 </section>
 
-<!-- 16 마무리 -->
+<!-- 17 마무리 -->
 <section class="slide chapter">
-  <div class="kicker">16 / 16 · 마무리</div>
+  <div class="kicker">17 / 17 · 마무리</div>
   <h1>감사합니다</h1>
   <p class="sub">질문 받겠습니다</p>
   <p class="small">팀 FC25 · 홍길동 · 김영희 · 이철수</p>
