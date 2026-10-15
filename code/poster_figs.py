@@ -1,4 +1,6 @@
-"""포스터(poster.html)에 넣을 그래프 3개와 QR 코드 2개를 SVG로 만들어 끼워 넣는 스크립트.
+"""v4 포스터(poster.html)에 넣을 그래프 3개와 QR 코드 2개를 SVG로 만들어 끼워 넣는 스크립트.
+
+v4 양식(2단 균등, 단 폭 260mm)에 맞춰 그래프 높이를 정했다. 혼동행렬(그림 2)을 크게 그린다.
 
 저장소 맨 위 폴더에서 실행한다: python3 code/poster_figs.py
 check.py와 같은 전처리·분할·모델을 사용하므로 그래프의 값은 check.py 수치와 같다.
@@ -7,7 +9,7 @@ check.py와 같은 전처리·분할·모델을 사용하므로 그래프의 값
 
 poster.html의 <!-- FIG:이름 --> 과 <!-- /FIG:이름 --> 사이를 새 SVG로 바꾼다.
   FIG:hist     2. 데이터  분포 그래프
-  FIG:bars     4. 결과    평가지표 비교 막대 그래프(기준선 + 후보 모델 전부, 선택 모델만 강조 색)
+  FIG:bars     4. 결과    평가지표 비교 묶음 막대(후보 모델 5종, 선택 모델만 강조 색, 기준선 정확도는 점선)
   FIG:result   4. 결과    결과 그래프(분류: 혼동행렬 히트맵)
   FIG:qr_repo  제목띠     저장소 QR
   FIG:qr_app   발치       앱 QR
@@ -39,6 +41,8 @@ GRAY = "#9aa0aa"        # 선택하지 않은 모델·나머지 점
 DARK = "#4a4f57"        # 기준선
 # 단 폭(인치) = (594mm - 좌우 여백 2×26mm - 단 사이 22mm) / 2 = 260mm. poster.html의 --pad-x·--gap을 바꾸면 다시 계산한다
 COL_W = 260 / 25.4
+# v4 그래프 높이(인치): 단 폭은 같고 높이만 정한다
+HIST_H, BARS_H, RESULT_H = 2.5, 3.6, 5.0
 
 plt.rcParams.update({
     "svg.fonttype": "none",          # 글자를 글자로 남겨 브라우저 글꼴로 그린다
@@ -152,7 +156,7 @@ means = df.groupby("label")[FEATURES].mean().reindex(ORDER)
 pos_color = {"DF": ACCENT, "MF": GRAY, "FW": DARK}
 pos_name = {"DF": f"DF 수비수 {(y == 'DF').sum()}명", "MF": f"MF 미드필더 {(y == 'MF').sum()}명",
             "FW": f"FW 공격수 {(y == 'FW').sum()}명"}
-fig, ax = plt.subplots(figsize=(COL_W, 2.4))
+fig, ax = plt.subplots(figsize=(COL_W, HIST_H))
 xs = np.arange(len(FEATURES))
 w = 0.27
 for i, c in enumerate(ORDER):
@@ -163,12 +167,12 @@ ax.set_ylim(0, 100)
 ax.set_yticks([0, 25, 50, 75, 100])
 ax.set_ylabel("능력치 평균")
 ax.tick_params(axis="x", length=0)
-ax.legend(loc="upper center", bbox_to_anchor=(0.5, 1.2), ncol=3, frameon=False, fontsize=20,
+ax.legend(loc="upper center", bbox_to_anchor=(0.5, 1.22), ncol=3, frameon=False, fontsize=20,
           handlelength=1.0, handletextpad=0.4, columnspacing=1.2)
 svg_hist = svg_of(fig)
 
-# 그래프 2(FIG:bars): 기준선과 후보 모델 다섯 개의 정확도·재현율(macro)·F1(macro)
-# check.py "후보 모델 비교"와 같은 모델·분할
+# 그래프 2(FIG:bars): 후보 모델 다섯 개의 정확도·재현율(macro)·F1(macro)
+# check.py "후보 모델 비교"와 같은 모델·분할. 기준선은 정확도만 뜻이 있어 막대 대신 점선으로 그린다
 code_of = {c: i for i, c in enumerate(ORDER)}
 majority = y_tr.value_counts().idxmax()
 rows = [("MF만 찍기(기준선)", np.full(len(y_te), majority))]
@@ -188,14 +192,15 @@ for name, m in models:
         pred = m.predict(X_te)
     rows.append((name, pred))
 PICK, BASE = "로지스틱 회귀(선택)", "MF만 찍기(기준선)"
+base_acc = accuracy_score(y_te, rows[0][1])
 scores = []
-for name, pred in rows:
+for name, pred in rows[1:]:
     _, r, f, _ = precision_recall_fscore_support(y_te, pred, labels=ORDER, zero_division=0)
     scores.append((name, accuracy_score(y_te, pred), r.mean(), f.mean()))
 
 METRICS = ["정확도", "재현율(macro)", "F1(macro)"]
 ALPHA = [1.0, 0.62, 0.34]           # 지표는 같은 색의 진하기로 구분한다
-fig, ax = plt.subplots(figsize=(COL_W * 0.6, 5.0))   # 오른쪽 40%에는 값 세 열을 적는다
+fig, ax = plt.subplots(figsize=(COL_W * 0.6, BARS_H))   # 오른쪽 40%에는 값 세 열을 적는다
 gh = 0.26                            # 막대 하나의 높이
 centers = np.arange(len(scores))[::-1] * 1.0
 VAL_X = [1.10, 1.36, 1.62]           # 값 열의 위치(막대 축 좌표 기준)
@@ -209,6 +214,8 @@ top = centers[0] + 0.75
 for k, lab in enumerate(METRICS):
     ax.add_patch(plt.Rectangle((VAL_X[k] - 0.235, top + 0.05), 0.04, 0.3, color=GRAY, alpha=ALPHA[k], clip_on=False))
     ax.text(VAL_X[k] - 0.185, top + 0.2, lab.replace("(macro)", ""), va="center", ha="left", fontsize=20, clip_on=False)
+ax.axvline(base_acc, color="#000", linestyle=(0, (4, 3)), linewidth=1.4)
+ax.text(base_acc + 0.015, top + 0.2, f"기준선 {base_acc:.3f}", va="center", ha="left", fontsize=20)
 ax.set_ylim(centers[-1] - 0.55, top + 0.45)
 ax.set_yticks(centers)
 ax.set_yticklabels([s[0] for s in scores])
@@ -228,12 +235,12 @@ svg_bars = svg_of(fig)
 logit = LogisticRegression(max_iter=2000).fit(X_tr, y_tr)
 cm = confusion_matrix(y_te, logit.predict(X_te), labels=ORDER)
 cmap = LinearSegmentedColormap.from_list("accent", ["#ffffff", ACCENT])
-fig, ax = plt.subplots(figsize=(COL_W, 3.5))
+fig, ax = plt.subplots(figsize=(COL_W, RESULT_H))
 ax.imshow(cm, cmap=cmap, vmin=0, vmax=cm.max(), aspect="auto")
 for i in range(3):
     for j in range(3):
         v = cm[i, j]
-        ax.text(j, i, f"{v}명", ha="center", va="center", fontsize=26, fontweight="bold",
+        ax.text(j, i, f"{v}명", ha="center", va="center", fontsize=34, fontweight="bold",
                 color="#fff" if v > cm.max() * 0.5 else "#000")
 ax.set_xticks(range(3))
 ax.set_xticklabels([f"예측 {c}" for c in ORDER])
@@ -251,6 +258,7 @@ svg_result = svg_of(fig)
 
 inject({"hist": svg_hist, "bars": svg_bars, "result": svg_result,
         "qr_repo": qr_svg(REPO_URL), "qr_app": qr_svg(APP_URL)})
+print(f"기준선 정확도 {base_acc:.3f}")
 for name, acc, rec, f1 in scores:
     print(f"{name}: 정확도 {acc:.3f} · 재현율(macro) {rec:.3f} · F1(macro) {f1:.3f}")
 print("혼동행렬(로지스틱):", cm.tolist())
