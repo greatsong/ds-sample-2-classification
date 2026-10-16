@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>팀 FC25 발표 · 능력치로 포지션 맞히기</title>
-<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   :root {
@@ -113,172 +112,9 @@
 <body>
 
 <!-- 1 제목 -->
-<section class="slide chapter">
-  <div class="kicker">1 / 17 · 제목</div>
-  <h1>능력치 여섯 개만 보고<br>선수의 포지션을 맞힐 수 있는가</h1>
-  <p class="sub">팀 FC25 · 20105 정민재 · 20112 최수아 · 20124 한지호</p>
-  <p class="small">선생님이 만든 가상 팀의 샘플 · 데이터와 수치는 실제 계산값</p>
-</section>
-
-<!-- 2 데이터셋 -->
+<!-- 모델 소개 4장 (연계 수행평가, 3분 발표). 교사 결정 2026-10-16: 프로젝트 1부 12장은 제출물에서 뺌 -->
 <section class="slide">
-  <div class="kicker">2 / 17 · 우리 팀의 데이터셋</div>
-  <h2>우리 팀의 데이터셋</h2>
-  <div class="withimg">
-    <ul class="facts txt">
-      <li>EA SPORTS FC 25 선수 능력치</li>
-      <li>modudata 사본, <b>800명 · 14개 열</b></li>
-      <li>입력: 속력 · 슈팅 · 패스 · 드리블 · 수비 · 피지컬</li>
-      <li>정답: 첫 포지션을 DF · MF · FW로, 골키퍼 <b>0명</b></li>
-    </ul>
-    <div class="diagram plot"><div class="chart" id="g2"></div></div>
-  </div>
-</section>
-
-<!-- 3 선택 이유 -->
-<section class="slide">
-  <div class="kicker">3 / 17 · 이 문제를 선택한 이유</div>
-  <h2>이 문제를 선택한 이유</h2>
-  <ul class="facts">
-    <li>셋 다 축구 게임으로 선수단을 짜 본 경험</li>
-    <li>능력치 모양만 봐도 짐작되는 포지션, 그 감의 확인</li>
-    <li>정답(포지션)이 데이터에 있어 분류로 확인 가능</li>
-    <li>팀원 생각: "미드필더가 제일 애매" · "수비 하나면 충분"</li>
-  </ul>
-</section>
-
-<!-- 4 과정 -->
-<section class="slide">
-  <div class="kicker">4 / 17 · 어떤 과정으로 분석했는지</div>
-  <h2>어떤 과정으로 분석했는지</h2>
-  <div class="steps">
-    <ol>
-      <li><span class="n">1</span><span class="k">수집</span>modudata CSV, 800명 · 14개 열</li>
-      <li><span class="n">2</span><span class="k">변수 선택</span>입력 능력치 6개 · 정답 포지션, overall 제외</li>
-      <li><span class="n">3</span><span class="k">전처리</span>결측 0 · 첫 포지션만 · DF · MF · FW 묶음</li>
-      <li><span class="n">4</span><span class="k">분할</span>640명 · 160명, 포지션 비율 유지, 난수 42</li>
-      <li><span class="n">5</span><span class="k">기준선</span>MF만 찍기, 정확도 0.450</li>
-    </ol>
-    <ol>
-      <li><span class="n">6</span><span class="k">후보 비교</span>모델 5종, 같은 분할 · 같은 지표</li>
-      <li><span class="n">7</span><span class="k">선택</span>차이 1~2명, 계수 해석 · FW 재현율 0.82</li>
-      <li><span class="n">8</span><span class="k">평가</span>정확도 0.844 · 범주별 F1, macro 0.845</li>
-      <li><span class="n">9</span><span class="k">해석</span>오답 25명 포지션 집계 · 능력치 하나 모델</li>
-      <li><span class="n">10</span><span class="k">한계 점검</span>애매한 레이블 232명 · CDM 재배치 · 교차검증 미실시</li>
-    </ol>
-  </div>
-</section>
-
-<!-- 5 고려한 모델 -->
-<section class="slide">
-  <div class="kicker">5 / 17 · 어떤 모델을 고려했는지</div>
-  <h2>어떤 모델을 고려했는지</h2>
-  <table class="mini">
-    <tr><th>모델</th><th>정확도</th><th>macro F1</th><th>FW 재현율</th></tr>
-    <tr><td>기준선(MF만 찍기)</td><td>0.450</td><td>-</td><td>-</td></tr>
-    <tr><td>로지스틱 회귀</td><td><em>0.844</em></td><td><em>0.845</em></td><td><em>0.82</em></td></tr>
-    <tr><td>k-NN(k=5)</td><td>0.856</td><td>0.846</td><td>0.76</td></tr>
-    <tr><td>결정 트리(깊이 4)</td><td>0.781</td><td>0.778</td><td>0.73</td></tr>
-    <tr><td>랜덤 포레스트(300그루)</td><td>0.850</td><td>0.849</td><td>0.79</td></tr>
-    <tr><td>XGBoost(기본값)</td><td>0.819</td><td>0.813</td><td>0.76</td></tr>
-  </table>
-  <p class="small">같은 분할: 학습 640명 · 시험 160명, 포지션 비율 유지</p>
-</section>
-
-<!-- 6 선택 이유 -->
-<section class="slide">
-  <div class="kicker">6 / 17 · 왜 이 모델을 선택했는지</div>
-  <h2>왜 이 모델을 선택했는지</h2>
-  <ul class="facts">
-    <li>최종: 로지스틱 회귀, 수업에서 배운 모델</li>
-    <li>계수로 읽는 능력치: DF 쪽 수비 <b>+0.200</b>, FW 쪽 슈팅 <b>+0.254</b></li>
-    <li>k-NN <b>0.856</b> · 랜덤 포레스트 <b>0.850</b>이 더 높음, 160명 중 2명 · 1명 차이</li>
-    <li>FW 재현율 <b>0.82</b>, 다섯 모델 중 최고</li>
-    <li>XGBoost: 우리 분할에서 <b>0.819</b>, 로지스틱 회귀보다 낮음</li>
-  </ul>
-</section>
-
-<!-- 7 평가지표 -->
-<section class="slide">
-  <div class="kicker">7 / 17 · 우리가 사용한 평가지표</div>
-  <h2>우리가 사용한 평가지표</h2>
-  <ul class="facts">
-    <li>정확도: 시험 선수 중 포지션을 맞힌 비율</li>
-    <li>재현율: 실제 그 포지션 중 찾아낸 비율 · F1: 정밀도와 재현율의 균형</li>
-    <li>우리 모델: 정확도 <b>0.844</b>(135명), macro F1 <b>0.845</b></li>
-    <li>기준선(MF만 찍기): 정확도 <b>0.450</b>(72명)</li>
-    <li>F1을 함께 본 이유: 정확도로는 어느 포지션에서 틀렸는지 모름</li>
-  </ul>
-</section>
-
-<!-- 8 결정 -->
-<section class="slide">
-  <div class="kicker">8 / 17 · 모델링 과정에서 우리 팀이 결정한 것</div>
-  <h2>모델링 과정에서 우리 팀이 결정한 것</h2>
-  <ul class="facts">
-    <li>첫 번째 포지션만 레이블로, 한 선수는 한 줄만</li>
-    <li>입력은 능력치 여섯 개만, overall · 몸값 · 나이 제외</li>
-    <li>학습 640명 · 시험 160명, 포지션 비율 유지</li>
-    <li>틀린 선수를 이상치로 빼지 않음</li>
-    <li>CDM을 DF로 옮긴 실험: 정확도 <b>0.856</b>, FW 재현율 <b>0.82 → 0.64</b></li>
-  </ul>
-</section>
-
-<!-- 9 해석 -->
-<section class="slide">
-  <div class="kicker">9 / 17 · 최종 분석 결과에 대한 우리 팀의 해석</div>
-  <h2>최종 분석 결과에 대한 우리 팀의 해석</h2>
-  <div class="withimg">
-    <div class="diagram plot"><div class="chart" id="g9"></div></div>
-    <ul class="facts txt small-facts insight">
-      <li><b>수비 높음 ≠ 수비수</b><span>수비 69↑ 중 DF <b>60.0%</b> · 슈팅 <b>0.731</b> &gt; 수비 <b>0.669</b></span></li>
-      <li><b>놓친 수비수는 공격형 풀백</b><span>풀백 <b>9/23명</b> 오답 · 센터백 <b>2/32명</b> · 칸셀루 · 데이비스</span></li>
-      <li><b>헷갈리는 선수가 MF로</b><span>오답 25명 중 <b>17명</b>이 MF 예측 · 이강인 · 그리즈만</span></li>
-    </ul>
-  </div>
-  <p class="small">오용 주의: 이 모델로 실제 선수의 포지션을 정하면 안 됨</p>
-</section>
-
-<!-- 10 찾아낸 것 -->
-<section class="slide">
-  <div class="kicker">10 / 17 · 우리 팀이 찾아낸 것</div>
-  <h2>우리 팀이 찾아낸 것</h2>
-  <table class="mini cmp">
-    <tr><th>발견</th><th>처음 생각</th><th>이 데이터에서는</th></tr>
-    <tr><td>수비수를 가른 것</td><td>수비 능력치 하나면 충분</td><td>슈팅 · 드리블이 낮은 쪽, 로드리는 수비 <em>87</em>의 MF</td></tr>
-    <tr><td>놓친 수비수</td><td>풀백 전체가 MF에 가까움</td><td>평균 풀백은 DF 쪽(거리 <em>13.7</em> 대 <em>19.8</em>), 공격형 풀백만</td></tr>
-    <tr><td>미드필더</td><td>가장 애매, 가장 많이 틀림</td><td>MF 재현율 <em>0.89</em> 최고, 능력치가 가장 고름(<em>5.4</em>)</td></tr>
-  </table>
-  <p class="point">포지션은 잘하는 것과 <b>덜 하는 것</b>으로 함께 구분됨</p>
-</section>
-
-<!-- 11 추가 연구 -->
-<section class="slide">
-  <div class="kicker">11 / 17 · 이후 추가로 연구한다면</div>
-  <h2>이후 추가로 연구한다면 더 해 보고 싶은 것</h2>
-  <table class="mini">
-    <tr><th>구분</th><th>키워드</th></tr>
-    <tr><td>더 해 볼 분석</td><td>골키퍼와 능력치 77 미만 포함, 여러 포지션 함께 맞히기</td></tr>
-    <tr><td>교과 연계</td><td>수학: 로지스틱 함수 · 체육: 포지션별 역할 · 정보: 분류 평가지표</td></tr>
-    <tr><td>진로 분야</td><td>스포츠 데이터 분석가 · 구단 스카우트 · 게임 기획자</td></tr>
-  </table>
-</section>
-
-<!-- 12 느낀 점 -->
-<section class="slide">
-  <div class="kicker">12 / 17 · 느끼고 배운 점</div>
-  <h2>AI를 활용하고 데이터를 분석하며 느끼고 배운 점</h2>
-  <ul class="facts small-facts">
-    <li>정민재: "숫자가 올랐다고 좋아지는 게 아니라는 걸 직접 확인해서 뿌듯했다."</li>
-    <li>최수아: "정확도 하나로 끝났다고 생각했는데 그게 시작이었다."</li>
-    <li>한지호: "AI 설명만 믿었으면 positions 열을 잘못 이해할 뻔했다."</li>
-  </ul>
-  <p class="point">AI 활용에서 배운 것: <b>추천 모델도 직접 비교</b> · <b>기준선은 같은 시험 데이터로</b></p>
-</section>
-
-<!-- 13~16 2부 · 모델 소개 (3분 발표) -->
-<section class="slide">
-  <div class="kicker">13 / 17 · 모델 소개 · 우리가 선택한 모델</div>
+  <div class="kicker">1 / 4 · 모델 소개 · 우리가 선택한 모델</div>
   <h2>우리가 선택한 모델: 로지스틱 회귀</h2>
   <ul class="facts small-facts">
     <li>원리: 범주마다 계수를 곱해 더한 점수, 확률로 바꿔 가장 높은 범주</li>
@@ -290,7 +126,7 @@
 </section>
 
 <section class="slide">
-  <div class="kicker">14 / 17 · 모델 소개 · 비교 모델 1</div>
+  <div class="kicker">2 / 4 · 모델 소개 · 비교 모델 1</div>
   <h2>비교 모델 1: k-NN(k=5)</h2>
   <ul class="facts small-facts">
     <li>원리: 능력치가 가장 가까운 선수 5명의 다수결</li>
@@ -302,7 +138,7 @@
 </section>
 
 <section class="slide">
-  <div class="kicker">15 / 17 · 모델 소개 · 비교 모델 2</div>
+  <div class="kicker">3 / 4 · 모델 소개 · 비교 모델 2</div>
   <h2>비교 모델 2: 결정 트리(깊이 4)</h2>
   <ul class="facts small-facts">
     <li>원리: "몇 점 이상인가" 질문으로 차례로 나눠 마지막 묶음의 다수 범주</li>
@@ -314,7 +150,7 @@
 </section>
 
 <section class="slide">
-  <div class="kicker">16 / 17 · 모델 소개 · 세 모델 비교 요약</div>
+  <div class="kicker">4 / 4 · 모델 소개 · 세 모델 비교 요약</div>
   <h2>세 모델 비교 요약</h2>
   <table class="mini cmp">
     <tr><th>모델</th><th>원리</th><th>장점</th><th>단점</th><th>적합한 상황</th><th>우리 데이터</th></tr>
@@ -323,14 +159,6 @@
     <tr><td>결정 트리</td><td>질문으로 나누기</td><td>규칙 읽기</td><td>과적합 · 계단 경계</td><td>규칙이 필요</td><td>0.781</td></tr>
   </table>
   <p class="point">우리 데이터에는 <b>로지스틱 회귀</b>: k-NN과 2명 차이보다 고른 재현율과 계수 해석</p>
-</section>
-
-<!-- 17 마무리 -->
-<section class="slide chapter">
-  <div class="kicker">17 / 17 · 마무리</div>
-  <h1>감사합니다</h1>
-  <p class="sub">질문 받겠습니다</p>
-  <p class="small">팀 FC25 · 정민재 · 최수아 · 한지호</p>
 </section>
 
 <div class="hint">← → 이동 · Home 처음으로</div>
